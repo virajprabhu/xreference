@@ -17,6 +17,7 @@ def index(request):
 
 		if 'title' in request.POST:
 			# Add request
+			file_url = request.POST['file_url']
 			title = request.POST['title']
 			author = request.POST['author']
 			keywords = request.POST['keywords']
@@ -24,7 +25,7 @@ def index(request):
 			venue = request.POST['venue']
 			pub = Publication(title=title, author=author,
 							 keywords=keywords, year=year,
-							 venue=venue)
+							 venue=venue, file_url=file_url)
 			pub.save()
 		else:
 			# Query request

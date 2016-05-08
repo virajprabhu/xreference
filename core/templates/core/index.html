@@ -5,6 +5,7 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script   src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="1jq1gclipzrqe30"></script>
 	<style>
 	footer {
 		position: fixed;
@@ -14,7 +15,40 @@
 		padding: 10 10 10 10;
 	}
 	</style>
+		<script type="text/javascript">
+		$(document).ready(function(){
+			options = {
 
+		    // Required. Called when a user selects an item in the Chooser.
+		    success: function(files) {
+		        $("#file_url").val(files[0].link);
+		    },
+
+		    // Optional. Called when the user closes the dialog without selecting a file
+		    // and does not include any parameters.
+		    cancel: function() {
+
+		    },
+
+		    // Optional. "preview" (default) is a preview link to the document for sharing,
+		    // "direct" is an expiring link to download the contents of the file. For more
+		    // information about link types, see Link types below.
+		    linkType: "preview", // or "direct"
+
+		    // Optional. A value of false (default) limits selection to a single file, while
+		    // true enables multiple file selection.
+		    multiselect: false, // or true
+
+		    // Optional. This is a list of file extensions. If specified, the user will
+		    // only be able to select files with these extensions. You may also specify
+		    // file types, such as "video" or "images" in the list. For more information,
+		    // see File types below. By default, all extensions are allowed.
+		    extensions: ['.pdf', '.doc', '.docx'],
+		};
+		var button = Dropbox.createChooseButton(options);
+		document.getElementById("dropbox-chooser").appendChild(button);
+	});
+	</script>
 </head>
 <body>
 	<div class="jumbotron">
@@ -23,14 +57,18 @@
 	</div>
 	</div>
 	<ul class="nav nav-tabs nav-justified">
-	<li><a data-toggle="tab" href="#add">add</a></li>
-	<li class="active"><a data-toggle="tab" href="#search">search</a></li>
+	<li><a data-toggle="tab" href="#add">Add</a></li>
+	<li class="active"><a data-toggle="tab" href="#search">Search</a></li>
 	</ul>
 	<div class="tab-content" >
 	<div id="add" class="container tab-pane fade in" style="margin-top: 20px;width:200px;">
 	<div class="row">
 	<form role="form" action="{% url 'core:index' %}" method="post">
 		{% csrf_token %}
+		<div class="form-group" id="dropbox-chooser">
+		<input type="text" id="file_url" name="file_url" style="display:none;">
+		</div>
+
 	  	<div class="form-group">
 		<input type="text" placeholder="Title" name="title" class="form-control">
 		</div>
@@ -55,7 +93,7 @@
 	</form>
 	</div>
 	</div>
-	<div id="search" class="container tab-pane fade in active" style="margin-top: 20px;max-width:400px;">
+	<div id="search" class="container tab-pane fade in active" style="margin-top: 20px;max-width:600px;">
 		<form role="form" action="{% url 'core:index' %}" method="post">
 		{% csrf_token %}
 	  	<div class="form-group">
@@ -71,21 +109,23 @@
 				<th>Title</th>
 				<th>Author</th>
 				<th>Year</th>
+				<th>Keywords</th>
 			</tr>
 			</thead>
 			<tbody>
 			{% for result in query_results %}
 			<tr>
-				<td>{{result.title}}</td>
+				<td><a href={{result.file_url}}>{{result.title}}</a></td>
 				<td>{{result.author}}</td>
 				<td>{{result.year}}</td>
+				<td>{{result.keywords}}</td>
 			</tr>
 			{% endfor %}
 			</tbody>
 			</table>
 			</div>
 			{% else %}
-				<p><h2>No search results found</h2></p>
+				<p><h4 class="text-center">No search results found.</h4></p>
 			{% endif %}
 		</div>
 	</div>
